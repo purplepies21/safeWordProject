@@ -1,0 +1,59 @@
+{
+  "project_info": {
+    "project_number": "735005862411",
+    "firebase_url": "https://safewordapp-1e8dc.firebaseio.com",
+    "project_id": "safewordapp-1e8dc",
+    "storage_bucket": "safewordapp-1e8dc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:735005862411:android:6be4ccb622a324fb",
+        "android_client_info": {
+          "package_name": "com.example.ashsaccount.safewordproject"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "735005862411-7kb1mfh1op5ca580ime60ku1uvfboo1i.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.ashsaccount.safewordproject",
+            "certificate_hash": "8b3c96781b810cee89d266000389f8dbe3d80484"
+          }
+        },
+        {
+          "client_id": "735005862411-p2kvld9r66eal25ee474eehg9qtksf1o.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "735005862411-p2kvld9r66eal25ee474eehg9qtksf1o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBss2UjgZG3njHCMj61Gx2ovAGoGqBvV90"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "735005862411-p2kvld9r66eal25ee474eehg9qtksf1o.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
