@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListAdapter;
@@ -66,31 +67,31 @@ public class MainActivity extends AppCompatActivity {
         String[] tempArray = {"abc", "123", "456", "yfgvc",};
 
         mUsername = ANONYMOUS;
-        firebaseDatabase=FirebaseDatabase.getInstance();
+        firebaseDatabase=FirebaseDatabase.getInstance().getInstance();
 
         firebaseStorage = FirebaseStorage.getInstance();
         textRef = firebaseStorage.getReference().child("textFiles");
         imageRef = firebaseStorage.getReference().child("images");
         databaseReference=firebaseDatabase.getReference().child("files");
-        uploadData();
+
         firebaseAuth = FirebaseAuth.getInstance();
         setContentView(R.layout.activity_main);
         List<RowData> rowData = new ArrayList<>();
         StorageReference storageReference;
-        customAdapter = new CustomAdapter(this, tempArray);
+        customAdapter = new CustomAdapter(this,R.layout.custom_row, rowData);
 
 
         messageListView = (ListView) findViewById(R.id.listView);
         messageListView.setAdapter(customAdapter);
-
+        attachDatabaseReadListener();
 
         imageButton = (FloatingActionButton) findViewById(R.id.fab);
 
         messageListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String food = String.valueOf(parent.getItemAtPosition(position));
-                Toast.makeText(MainActivity.this, food, Toast.LENGTH_LONG).show();
+                String item = String.valueOf(parent.getItemAtPosition(position));
+                Toast.makeText(MainActivity.this, item, Toast.LENGTH_LONG).show();
             }
         });
 
@@ -131,8 +132,36 @@ public class MainActivity extends AppCompatActivity {
                                            }
                                        }
         );
+
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.sign_out_menu:
+                //sign out
+                AuthUI.getInstance().signOut(this);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+
+
+        }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        firebaseAuth.addAuthStateListener(authStateListener);
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if(authStateListener!=null) {
+            firebaseAuth.removeAuthStateListener(authStateListener);
+        }
+        detachDatabaseReadListener();
+        customAdapter.clear();
+    }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -159,7 +188,7 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void onSuccess(Uri uri) {
                             Uri dlUri = uri;
-                            RowData rowData= new RowData(null, mUsername, dlUri.toString());
+                            RowData rowData= new RowData(photoRef.getName() +".jpg", mUsername, dlUri.toString(), null);
                             databaseReference.push().setValue(rowData);
                         }
                     });
@@ -189,12 +218,12 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                     RowData row= dataSnapshot.getValue(RowData.class);
-                    customAdapter.add(row.getName().toString());
+                    customAdapter.add(row);
                 }
 
                 @Override
                 public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                    RowData row = dataSnapshot.getValue(RowData.class);
+
 
                 }
 
@@ -212,7 +241,8 @@ public class MainActivity extends AppCompatActivity {
                 public void onCancelled(@NonNull DatabaseError databaseError) {
 
                 }
-            };
+            }; databaseReference.addChildEventListener(childEventListener);
+
 
         }
     }    private void detachDatabaseReadListener() {
@@ -222,7 +252,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
     private void uploadData(){
-        RowData rowData= new RowData("Hello!", mUsername, null);
+        RowData rowData= new RowData("Hello!", mUsername, null, null);
         databaseReference.push().setValue(rowData);
         // Clear input box
 

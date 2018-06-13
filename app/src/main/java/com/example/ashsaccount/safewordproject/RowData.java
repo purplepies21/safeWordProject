@@ -6,14 +6,15 @@ public class RowData {
     private String text;
     private String name;
     private String photoUrl;
+    private String fileUrl;
 
     public RowData() {
     }
 
-    public RowData( String text, String name, String photoUrl) {
-        if(text!=null) {
+    public RowData( String text, String name, String photoUrl, String fileUrl) {
+
             this.text = text;
-        }
+
         this.name = name;
         this.photoUrl = photoUrl;
     }
@@ -41,4 +42,12 @@ public class RowData {
     public void setPhotoUrl(String photoUrl) {
         this.photoUrl = photoUrl;
     }
+    public String getFileUrl() {
+        return fileUrl;
+    }
+
+    public void setFileUrl(String fileUrl) {
+        this.fileUrl = fileUrl;
+    }
+
 }
