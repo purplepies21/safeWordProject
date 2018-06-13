@@ -16,8 +16,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
-import com.github.orangegangsters.lollipin.lib.managers.AppLockActivity;
-import com.github.orangegangsters.lollipin.lib.managers.LockManager;
+
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -38,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     public static final String ANONYMOUS = "anonymous";
-    public static final String REQUEST_CODE_ENABLE= "requestCode";
+//    public static final String REQUEST_CODE_ENABLE= "requestCode";
 
     private static final int RC_SIGN_IN = 123;
     private ChildEventListener childEventListener;
@@ -57,8 +56,6 @@ public class MainActivity extends AppCompatActivity {
     private DatabaseReference databaseReference;
     private StorageReference imageRef;
     private StorageReference textRef;
-    LockManager lockManager;
-    private AppLockActivity appLockActivity;
 
 
 
@@ -73,8 +70,7 @@ public class MainActivity extends AppCompatActivity {
         mUsername = ANONYMOUS;
         /////////////SETUP FOR LOLLIPIN (pin/fingerprint reading Library)//////
          firebaseDatabase=FirebaseDatabase.getInstance().getInstance();
-    lockManager=LockManager.getInstance();
-    lockManager.enableAppLock(this, CustomPinActivity.class);
+
         ///////////////////////////
 
 
@@ -104,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, item, Toast.LENGTH_LONG).show();
             }
         });
-        
+
 
         authStateListener = new FirebaseAuth.AuthStateListener() {
             @Override

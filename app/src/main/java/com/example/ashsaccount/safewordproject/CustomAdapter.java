@@ -12,7 +12,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.github.orangegangsters.lollipin.lib.managers.LockManager;
 
 import java.util.List;
 
@@ -27,7 +26,6 @@ public class CustomAdapter extends ArrayAdapter<RowData> {
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         LayoutInflater inflater= LayoutInflater.from(getContext());
         View customView = ((Activity) getContext()).getLayoutInflater().inflate(R.layout.custom_row, parent, false);
-        LockManager<CustomPinActivity>= LockManager.getInstance();
 
         RowData singleItem=getItem(position);
         TextView rowTextView= (TextView) customView.findViewById(R.id.rowText);
@@ -52,7 +50,7 @@ public class CustomAdapter extends ArrayAdapter<RowData> {
             rowTextView.setText(singleItem.getText());
 
         }
-        if(){}
+
         return customView;
 
 
