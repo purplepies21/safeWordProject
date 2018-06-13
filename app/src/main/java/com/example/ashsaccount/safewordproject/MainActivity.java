@@ -8,6 +8,8 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -57,6 +59,8 @@ public class MainActivity extends AppCompatActivity {
     StorageReference imageRef;
     StorageReference textRef;
     StorageReference storageRef;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,6 +125,8 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
+
+
         imageButton.setOnClickListener(new View.OnClickListener() {
                                            @Override
                                            public void onClick(View view) {
@@ -135,12 +141,23 @@ public class MainActivity extends AppCompatActivity {
 
     }
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_menu,menu);
+        return super.onCreateOptionsMenu(menu);
+
+    }
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.sign_out_menu:
                 //sign out
                 AuthUI.getInstance().signOut(this);
                 return true;
+            case R.id.new_text_file_menu:
+                //Need to create or find a simple text editor!
+                return true;
+
             default:
                 return super.onOptionsItemSelected(item);
 
