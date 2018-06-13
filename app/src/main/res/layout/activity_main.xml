@@ -21,15 +21,15 @@
         app:srcCompat="@drawable/landscapesilhouetteclipart" />
 
 
-
-
     <ListView
         android:id="@+id/listView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        tools:listitem="@layout/custom_row"
-        android:gravity="center"></ListView>
+        android:gravity="center"
+        tools:listitem="@layout/custom_row">
 
+
+    </ListView>
 </RelativeLayout>

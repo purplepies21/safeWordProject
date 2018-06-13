@@ -1,23 +1,23 @@
 package com.example.ashsaccount.safewordproject;
 
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
+import com.github.orangegangsters.lollipin.lib.managers.AppLockActivity;
+import com.github.orangegangsters.lollipin.lib.managers.LockManager;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -38,8 +38,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     public static final String ANONYMOUS = "anonymous";
-    public static final int DEFAULT_MSG_LENGTH_LIMIT = 1000;
-    public static final String FRIENDLY_MSG_LENGTH_KEY= "friendly_msg_length";
+    public static final String REQUEST_CODE_ENABLE= "requestCode";
 
     private static final int RC_SIGN_IN = 123;
     private ChildEventListener childEventListener;
@@ -56,9 +55,10 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseDatabase firebaseDatabase;
     private String mUsername;
     private DatabaseReference databaseReference;
-    StorageReference imageRef;
-    StorageReference textRef;
-    StorageReference storageRef;
+    private StorageReference imageRef;
+    private StorageReference textRef;
+    LockManager lockManager;
+    private AppLockActivity appLockActivity;
 
 
 
@@ -66,12 +66,18 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
+//TODO Lock specific files from being accessed without fingerprint or pin authentication
 
         String[] tempArray = {"abc", "123", "456", "yfgvc",};
 
         mUsername = ANONYMOUS;
-        firebaseDatabase=FirebaseDatabase.getInstance().getInstance();
+        /////////////SETUP FOR LOLLIPIN (pin/fingerprint reading Library)//////
+         firebaseDatabase=FirebaseDatabase.getInstance().getInstance();
+    lockManager=LockManager.getInstance();
+    lockManager.enableAppLock(this, CustomPinActivity.class);
+        ///////////////////////////
+
+
 
         firebaseStorage = FirebaseStorage.getInstance();
         textRef = firebaseStorage.getReference().child("textFiles");
@@ -98,6 +104,7 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, item, Toast.LENGTH_LONG).show();
             }
         });
+        
 
         authStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -156,6 +163,9 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             case R.id.new_text_file_menu:
                 //Need to create or find a simple text editor!
+                return true;
+            case R.id.new_pin_menu:
+
                 return true;
 
             default:

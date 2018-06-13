@@ -1,13 +1,11 @@
 package com.example.ashsaccount.safewordproject;
 
-import android.support.annotation.Nullable;
-
 public class RowData {
     private String text;
     private String name;
     private String photoUrl;
     private String fileUrl;
-
+    private boolean lockRow;
     public RowData() {
     }
 
@@ -42,12 +40,21 @@ public class RowData {
     public void setPhotoUrl(String photoUrl) {
         this.photoUrl = photoUrl;
     }
+
     public String getFileUrl() {
         return fileUrl;
     }
 
     public void setFileUrl(String fileUrl) {
         this.fileUrl = fileUrl;
+    }
+    public boolean getLocked() {
+        return lockRow;
+    }
+
+    public void setLock(boolean lockRow) {
+        this.lockRow = lockRow;
+
     }
 
 }

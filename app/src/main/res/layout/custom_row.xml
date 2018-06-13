@@ -13,11 +13,19 @@
 
     <TextView
         android:id="@+id/rowText"
-        android:layout_width="wrap_content"
+        android:layout_width="256dp"
         android:layout_height="31dp"
         android:layout_margin="5dp"
         android:layout_weight="1"
         android:text="TextView"
         android:textSize="18sp" />
+
+    <ImageView
+        android:id="@+id/lockImage"
+        android:layout_width="wrap_content"
+        android:layout_height="63dp"
+        android:layout_weight="1"
+        android:visibility="invisible"
+        app:srcCompat="@android:drawable/ic_lock_idle_lock" />
     />
 </LinearLayout>

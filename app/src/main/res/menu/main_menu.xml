@@ -7,6 +7,10 @@
         android:title="@string/new_text_file_text"
         app:showAsAction="never" />
     <item
+        android:id="@+id/new_pin_menu"
+        android:title="@string/create_a_pin_text"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/sign_out_menu"
         android:title="@string/sign_out"
         app:showAsAction="never" />
