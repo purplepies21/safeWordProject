@@ -36,18 +36,33 @@ public class CustomAdapter extends ArrayAdapter<RowData> {
 
         boolean isPhoto = singleItem.getPhotoUrl() != null;
         if (isPhoto) {
-
-            Glide.with(image.getContext())
-                    .load(singleItem.getPhotoUrl())
-                    .into(image);
+            if (singleItem.getLock() == false) {
+                Glide.with(image.getContext())
+                        .load(singleItem.getPhotoUrl())
+                        .into(image);
+            }
             rowTextView.setText(singleItem.getText());
-        } else if (!singleItem.getLock()) {
+        } else{
             Glide.with(image.getContext())
                     .load(R.drawable.txtthumb)
                     .into(image);
         }
 
 
+        image.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(singleItem.getLock()){
+                   
+
+// Intent intent= new Intent();
+//                    startActivity(intent);
+//                    finish();
+//
+
+                }
+            }
+        });
         if (singleItem.getText() != null) {
             rowTextView.setText(singleItem.getText());
 

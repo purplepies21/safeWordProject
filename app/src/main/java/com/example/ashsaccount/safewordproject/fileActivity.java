@@ -1,4 +1,8 @@
 package com.example.ashsaccount.safewordproject;
 
-public class fileActivity {
+import android.support.v7.app.AppCompatActivity;
+
+public class fileActivity extends AppCompatActivity{
+
+
 }

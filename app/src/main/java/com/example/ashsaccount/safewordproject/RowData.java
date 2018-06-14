@@ -10,7 +10,7 @@ public class RowData {
     public RowData() {
     }
 
-    public RowData( String text, String name, String photoUrl, String fileUrl, boolean locked) {
+    public RowData( String text, String name, String photoUrl, boolean locked) {
 
             this.text = text;
 

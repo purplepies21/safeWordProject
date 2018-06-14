@@ -171,7 +171,7 @@ public class MainActivity extends AppCompatActivity {
                 AuthUI.getInstance().signOut(this);
                 return true;
             case R.id.new_text_file_menu:
-                //Need to create or find a simple text editor!
+                uploadData();
                 return true;
             case R.id.new_pin_menu:
                 Intent intent= new Intent(getApplicationContext(), CreatePasswordActivity.class);
@@ -226,7 +226,7 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void onSuccess(Uri uri) {
                             Uri dlUri = uri;
-                            RowData rowData= new RowData(photoRef.getName() +".jpg", mUsername, dlUri.toString(), null, false);
+                            RowData rowData= new RowData(photoRef.getName() +".jpg", mUsername, dlUri.toString(), false);
                             databaseReference.push().setValue(rowData);
                         }
                     });
@@ -290,7 +290,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
     private void uploadData(){
-        RowData rowData= new RowData("Hello!", mUsername, null, null, false);
+        RowData rowData= new RowData("Hello!", mUsername, null,  true);
         databaseReference.push().setValue(rowData);
         // Clear input box
 
