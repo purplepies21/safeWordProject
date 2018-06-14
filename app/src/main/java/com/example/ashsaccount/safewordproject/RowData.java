@@ -1,20 +1,24 @@
 package com.example.ashsaccount.safewordproject;
 
+import android.widget.ImageView;
+
 public class RowData {
     private String text;
     private String name;
     private String photoUrl;
     private String fileUrl;
     private boolean lockRow;
+    private String userID;
     public RowData() {
     }
 
-    public RowData( String text, String name, String photoUrl, String fileUrl) {
+    public RowData( String text, String name, String photoUrl, String fileUrl, String uid) {
 
             this.text = text;
 
         this.name = name;
         this.photoUrl = photoUrl;
+        userID=uid;
     }
 
     public String getText() {

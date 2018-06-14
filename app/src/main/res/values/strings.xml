@@ -6,4 +6,5 @@
     <string name="create_a_pin_text">Create a PIN</string>
     <string name="create_pattern_text">Create Pattern</string>
     <string name="input_password_text">Input Password</string>
+    <string name="enter_your_pattern_text">Enter your pattern</string>
 </resources>

@@ -62,7 +62,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
 //TODO Lock specific files from being accessed without fingerprint or pin authentication
 
         String[] tempArray = {"abc", "123", "456", "yfgvc",};
@@ -141,6 +140,7 @@ public class MainActivity extends AppCompatActivity {
                                            }
                                        }
         );
+        uploadData();
 
     }
     @Override
@@ -211,7 +211,7 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void onSuccess(Uri uri) {
                             Uri dlUri = uri;
-                            RowData rowData= new RowData(photoRef.getName() +".jpg", mUsername, dlUri.toString(), null);
+                            RowData rowData= new RowData(photoRef.getName() +".jpg", mUsername, dlUri.toString(), null, FirebaseAuth.getInstance().getUid());
                             databaseReference.push().setValue(rowData);
                         }
                     });
@@ -275,7 +275,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
     private void uploadData(){
-        RowData rowData= new RowData("Hello!", mUsername, null, null);
+        RowData rowData= new RowData("Hello!", mUsername, null, null, firebaseAuth.getUid());
         databaseReference.push().setValue(rowData);
         // Clear input box
 
