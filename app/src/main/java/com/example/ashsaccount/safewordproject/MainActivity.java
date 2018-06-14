@@ -3,6 +3,7 @@ package com.example.ashsaccount.safewordproject;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -11,12 +12,11 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
-
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -44,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
     CustomAdapter customAdapter;
     ListView messageListView;
     FloatingActionButton imageButton;
+    ImageButton lockButton;
     private static final int RC_PHOTO_PICKER =  2;
 
 
@@ -56,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
     private DatabaseReference databaseReference;
     private StorageReference imageRef;
     private StorageReference textRef;
+    private Handler handler;
 
 
 
@@ -75,16 +77,20 @@ public class MainActivity extends AppCompatActivity {
 
 
         firebaseStorage = FirebaseStorage.getInstance();
-        textRef = firebaseStorage.getReference().child("textFiles");
-        imageRef = firebaseStorage.getReference().child("images");
-        databaseReference=firebaseDatabase.getReference().child("files");
+
+
 
         firebaseAuth = FirebaseAuth.getInstance();
         setContentView(R.layout.activity_main);
-        List<RowData> rowData = new ArrayList<>();
+        final List<RowData> rowData = new ArrayList<>();
         StorageReference storageReference;
         customAdapter = new CustomAdapter(this,R.layout.custom_row, rowData);
-
+        ///
+        handler = new Handler();
+        databaseReference=firebaseDatabase.getReference().child("/users").child(firebaseAuth.getUid()).child("files");
+        textRef = firebaseStorage.getReference().child("user").child(firebaseAuth.getUid()).child("textFiles");;
+        imageRef = firebaseStorage.getReference().child("user").child(firebaseAuth.getUid()).child("images");
+        ///
 
         messageListView = (ListView) findViewById(R.id.listView);
         messageListView.setAdapter(customAdapter);
@@ -92,13 +98,20 @@ public class MainActivity extends AppCompatActivity {
 
         imageButton = (FloatingActionButton) findViewById(R.id.fab);
 
-        messageListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String item = String.valueOf(parent.getItemAtPosition(position));
-                Toast.makeText(MainActivity.this, item, Toast.LENGTH_LONG).show();
-            }
-        });
+//        messageListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                String item = String.valueOf(parent.getItemAtPosition(position));
+//
+//                Toast.makeText(MainActivity.this, item, Toast.LENGTH_LONG).show();
+//            }
+//        });
+
+
+
+
+
+
 
 
         authStateListener = new FirebaseAuth.AuthStateListener() {
@@ -140,7 +153,7 @@ public class MainActivity extends AppCompatActivity {
                                            }
                                        }
         );
-        uploadData();
+
 
     }
     @Override
@@ -161,7 +174,9 @@ public class MainActivity extends AppCompatActivity {
                 //Need to create or find a simple text editor!
                 return true;
             case R.id.new_pin_menu:
-
+                Intent intent= new Intent(getApplicationContext(), CreatePasswordActivity.class);
+                startActivity(intent);
+                finish();
                 return true;
 
             default:

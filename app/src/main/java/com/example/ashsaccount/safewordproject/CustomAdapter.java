@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -28,6 +29,7 @@ public class CustomAdapter extends ArrayAdapter<RowData> {
         View customView = ((Activity) getContext()).getLayoutInflater().inflate(R.layout.custom_row, parent, false);
 
         RowData singleItem=getItem(position);
+        ImageButton lockButton= customView.findViewById(R.id.lockImage);
         TextView rowTextView= (TextView) customView.findViewById(R.id.rowText);
         ImageView image= (ImageView) customView.findViewById(R.id.itemImage);
         rowTextView.setText(singleItem.getText());
@@ -48,6 +50,10 @@ public class CustomAdapter extends ArrayAdapter<RowData> {
 
         if(singleItem.getText()!=null){
             rowTextView.setText(singleItem.getText());
+
+        }
+        if(singleItem.getLocked()==true){
+            lockButton.setImageResource(R.drawable.locked);
 
         }
 

@@ -28,6 +28,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-storage:16.0.1'
     implementation 'com.android.support:design:27.0.0'
     implementation'com.firebaseui:firebase-ui-auth:4.0.1'
+    implementation "jp.wasabeef:richeditor-android:1.2.2"
     //PIN
     implementation 'com.andrognito.patternlockview:patternlockview:1.0.0'
     // Displaying images
