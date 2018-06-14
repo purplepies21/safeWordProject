@@ -53,7 +53,7 @@ public class CustomAdapter extends ArrayAdapter<RowData> {
             @Override
             public void onClick(View v) {
                 if(singleItem.getLock()){
-                   
+
 
 // Intent intent= new Intent();
 //                    startActivity(intent);
