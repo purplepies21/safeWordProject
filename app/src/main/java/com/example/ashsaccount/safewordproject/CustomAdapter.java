@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -25,13 +24,13 @@ public class CustomAdapter extends ArrayAdapter<RowData> {
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        LayoutInflater inflater= LayoutInflater.from(getContext());
+        LayoutInflater inflater = LayoutInflater.from(getContext());
         View customView = ((Activity) getContext()).getLayoutInflater().inflate(R.layout.custom_row, parent, false);
 
-        RowData singleItem=getItem(position);
-        ImageButton lockButton= customView.findViewById(R.id.lockImage);
-        TextView rowTextView= (TextView) customView.findViewById(R.id.rowText);
-        ImageView image= (ImageView) customView.findViewById(R.id.itemImage);
+        final RowData singleItem = getItem(position);
+        final ImageView lockButton = customView.findViewById(R.id.lockImage);
+        TextView rowTextView = (TextView) customView.findViewById(R.id.rowText);
+        ImageView image = (ImageView) customView.findViewById(R.id.itemImage);
         rowTextView.setText(singleItem.getText());
         image.setImageResource(R.drawable.ic_launcher_foreground);
 
@@ -42,23 +41,41 @@ public class CustomAdapter extends ArrayAdapter<RowData> {
                     .load(singleItem.getPhotoUrl())
                     .into(image);
             rowTextView.setText(singleItem.getText());
-        } else {
+        } else if (!singleItem.getLock()) {
             Glide.with(image.getContext())
                     .load(R.drawable.txtthumb)
                     .into(image);
         }
 
-        if(singleItem.getText()!=null){
+
+        if (singleItem.getText() != null) {
             rowTextView.setText(singleItem.getText());
 
         }
-        if(singleItem.getLocked()==true){
-            lockButton.setImageResource(R.drawable.locked);
 
+        if (singleItem.getLock() == true) {
+
+            lockButton.setImageResource(R.drawable.locked);
         }
+        lockButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (singleItem.getLock() == true) {
+                   singleItem.setLock(false);
+                    lockButton.setImageResource(R.drawable.unlocked);
+                }else {
+                    singleItem.setLock(true);
+                    lockButton.setImageResource(R.drawable.locked);
+                }
+            }
+        });
+
+
 
         return customView;
 
-
     }
+
+
+
 }

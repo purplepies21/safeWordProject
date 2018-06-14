@@ -1,7 +1,5 @@
 package com.example.ashsaccount.safewordproject;
 
-import android.widget.ImageView;
-
 public class RowData {
     private String text;
     private String name;
@@ -12,13 +10,13 @@ public class RowData {
     public RowData() {
     }
 
-    public RowData( String text, String name, String photoUrl, String fileUrl, String uid) {
+    public RowData( String text, String name, String photoUrl, String fileUrl, boolean locked) {
 
             this.text = text;
 
         this.name = name;
         this.photoUrl = photoUrl;
-        userID=uid;
+        lockRow=locked;
     }
 
     public String getText() {
@@ -52,7 +50,7 @@ public class RowData {
     public void setFileUrl(String fileUrl) {
         this.fileUrl = fileUrl;
     }
-    public boolean getLocked() {
+    public boolean getLock() {
         return lockRow;
     }
 

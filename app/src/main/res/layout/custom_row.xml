@@ -20,7 +20,7 @@
         android:text="TextView"
         android:textSize="18sp" />
 
-    <ImageButton
+    <ImageView
         android:id="@+id/lockImage"
         android:layout_width="wrap_content"
         android:layout_height="63dp"

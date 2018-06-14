@@ -226,7 +226,7 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void onSuccess(Uri uri) {
                             Uri dlUri = uri;
-                            RowData rowData= new RowData(photoRef.getName() +".jpg", mUsername, dlUri.toString(), null, FirebaseAuth.getInstance().getUid());
+                            RowData rowData= new RowData(photoRef.getName() +".jpg", mUsername, dlUri.toString(), null, false);
                             databaseReference.push().setValue(rowData);
                         }
                     });
@@ -290,7 +290,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
     private void uploadData(){
-        RowData rowData= new RowData("Hello!", mUsername, null, null, firebaseAuth.getUid());
+        RowData rowData= new RowData("Hello!", mUsername, null, null, false);
         databaseReference.push().setValue(rowData);
         // Clear input box
 
