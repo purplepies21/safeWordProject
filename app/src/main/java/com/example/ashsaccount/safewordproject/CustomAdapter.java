@@ -60,7 +60,7 @@ public class CustomAdapter extends ArrayAdapter<RowData> {
                 if(singleItem.getLock()){
 
 
-// Intent intent= new Intent(MainActivity.this, fileActivity.class);
+// Intent intent= new Intent(MainActivity.this, FileActivity.class);
 //                    startActivity(intent);
 //                    finish();
 
