@@ -43,7 +43,7 @@ public class InputPasswordActivity extends AppCompatActivity{
                 if(password.equals(PatternLockUtils.patternToString(mPatternLockView, pattern))) {
 
 
-                    Intent intent = new Intent(getApplicationContext(), LockedFileActivity.class);
+                    Intent intent = new Intent(getApplicationContext(), FileActivity.class);
                     startActivity(intent);
                     finish();
                 }else{
