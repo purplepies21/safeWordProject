@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int RC_SIGN_IN = 123;
     private ChildEventListener childEventListener;
-    static CustomAdapter customAdapter;
+    public static CustomAdapter customAdapter;
     ListView messageListView;
     FloatingActionButton imageButton;
     ImageButton lockButton;
@@ -59,9 +59,6 @@ public class MainActivity extends AppCompatActivity {
     private StorageReference imageRef;
     private StorageReference textRef;
     private Handler handler;
-    public static ArrayList<RowData> rowData;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,35 +81,38 @@ public class MainActivity extends AppCompatActivity {
 
         firebaseAuth = FirebaseAuth.getInstance();
         setContentView(R.layout.activity_main);
-         rowData = new ArrayList<RowData>();
+
+        //rowData = new ArrayList<RowData>();
+
         StorageReference storageReference;
         ///
         handler = new Handler();
-        databaseReference=firebaseDatabase.getReference().child("/users").child(firebaseAuth.getUid()).child("files");
-        textRef = firebaseStorage.getReference().child("user").child(firebaseAuth.getUid()).child("textFiles");;
-        imageRef = firebaseStorage.getReference().child("user").child(firebaseAuth.getUid()).child("images");
-        ///
+
 
         messageListView = (ListView) findViewById(R.id.listView);
 
 
 
 
-        attachDatabaseReadListener();
-        customAdapter = new CustomAdapter(this,R.layout.custom_row, rowData);
-        messageListView.setAdapter(customAdapter);
-
-
         imageButton = (FloatingActionButton) findViewById(R.id.fab);
+        try {
+            databaseReference = firebaseDatabase.getReference().child("/users").child(firebaseAuth.getUid()).child("files");
+            textRef = firebaseStorage.getReference().child("user").child(firebaseAuth.getUid()).child("textFiles");
 
-//        messageListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                String item = String.valueOf(parent.getItemAtPosition(position));
+            imageRef = firebaseStorage.getReference().child("user").child(firebaseAuth.getUid()).child("images");
+            attachDatabaseReadListener();
+        }catch(NullPointerException e)
+        {
+//            databaseReference = firebaseDatabase.getReference().child("/users").child("Unauthorized").child("files");
+//            textRef = firebaseStorage.getReference().child("user").child("Unauthorized").child("textFiles");
 //
-//                Toast.makeText(MainActivity.this, item, Toast.LENGTH_LONG).show();
-//            }
-//        });
+//            imageRef = firebaseStorage.getReference().child("user").child("Unauthorized").child("images");
+//            attachDatabaseReadListener();
+
+        }        ///
+
+        customAdapter = new CustomAdapter(this);
+        messageListView.setAdapter(customAdapter);
 
 
 
@@ -146,6 +146,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         };
+
 
 
 
@@ -245,8 +246,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
-
     private void onSignedOutCleanup(){
         mUsername=ANONYMOUS;
         customAdapter.clear();
@@ -254,7 +253,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void onSignedInInitialize(String displayName) {
         mUsername=displayName;
-        attachDatabaseReadListener();
 
     }
     private void attachDatabaseReadListener(){
@@ -262,10 +260,8 @@ public class MainActivity extends AppCompatActivity {
             childEventListener = new ChildEventListener() {
                 @Override
                 public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                    RowData row= dataSnapshot.getValue(RowData.class);
-
-                    customAdapter.add(row);
-                    Log.v("potato",rowData.get(rowData.size()).getText());
+                    RowData row = dataSnapshot.getValue(RowData.class);
+                    customAdapter.addItem(row);
                 }
 
                 @Override
@@ -302,12 +298,6 @@ public class MainActivity extends AppCompatActivity {
         RowData rowData= new RowData("Hello!", mUsername, null,  true);
         databaseReference.push().setValue(rowData);
         // Clear input box
-
-    }
-
-    final public RowData getRow(int i){
-
-        return rowData.get(i);
 
     }
 }

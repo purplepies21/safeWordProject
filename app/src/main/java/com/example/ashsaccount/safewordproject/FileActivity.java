@@ -42,15 +42,19 @@ private TextView mainTextView;
         Intent intent= getIntent();
         mainTextView=findViewById(R.id.editText);
         fileNameTextView= findViewById(R.id.textView);
+        image= findViewById(R.id.imageView2);
 
 
 
         if(intent!=null){
-        position=intent.getExtras().getInt("position");
-        Log.v("potato", "the position is "+ position);
-            image= findViewById(R.id.imageView2);
+            position=intent.getExtras().getInt("position");
 
-       row= MainActivity.customAdapter.getItem(position);
+            Log.v("potato", "the position is "+ position);
+            Log.v("potato", "item at position is "+ MainActivity.customAdapter.getSingleItem(position).getText() );
+
+
+
+       row = MainActivity.customAdapter.getSingleItem(position);
             if (row.getPhotoUrl() != null) {
                 mainTextView.setVisibility(View.GONE);
 
@@ -60,7 +64,7 @@ private TextView mainTextView;
 
 
 
-            }else{
+            } else {
                 mainTextView.setVisibility(View.VISIBLE);
                 mainTextView.setVisibility(View.GONE);
 

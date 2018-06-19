@@ -3,8 +3,10 @@ package com.example.ashsaccount.safewordproject;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.inputmethodservice.Keyboard;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,17 +17,31 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class CustomAdapter extends ArrayAdapter<RowData> {
 
-    static RowData singleItem;
-    static ArrayList<RowData> items;
+    private RowData singleItem;
+    private ArrayList<RowData> items = new ArrayList<RowData>();
     private Context context;
-    public CustomAdapter(@NonNull Context context, int resource, List<RowData> objects) {
-        super(context,R.layout.custom_row, objects);
-    this.context=context;
 
+    public CustomAdapter(@NonNull Context context) {
+        super(context,R.layout.custom_row);
+        this.context=context;
+    }
+
+    public RowData getSingleItem(int position) {
+        return items.get(position);
+    }
+
+    @Override
+    public int getCount() {
+        return items.size();
+    }
+
+    public void addItem(RowData rowData) {
+        items.add(rowData);
+        Log.v("potato", "adding row : " + rowData.getText());
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -34,7 +50,7 @@ public class CustomAdapter extends ArrayAdapter<RowData> {
         LayoutInflater inflater = LayoutInflater.from(getContext());
         View customView = ((Activity) getContext()).getLayoutInflater().inflate(R.layout.custom_row, parent, false);
 
-        singleItem = getItem(position);
+        singleItem = getSingleItem(position);
         final ImageView lockButton = customView.findViewById(R.id.lockImage);
         TextView rowTextView = (TextView) customView.findViewById(R.id.rowText);
         ImageView image = (ImageView) customView.findViewById(R.id.itemImage);
@@ -92,12 +108,19 @@ public class CustomAdapter extends ArrayAdapter<RowData> {
             }
         });
 
-rowTextView.setOnClickListener(new View.OnClickListener() {
+    rowTextView.setOnClickListener(new View.OnClickListener() {
     @Override
     public void onClick(View v) {
-Intent intent=new Intent(context, InputPasswordActivity.class);
-intent.putExtra("position", position);
-context.startActivity(intent);
+        if(singleItem.getLock()==true) {
+            Intent intent = new Intent(context, InputPasswordActivity.class);
+            intent.putExtra("position", position);
+            context.startActivity(intent);
+        }else{
+            Intent intent = new Intent(context, FileActivity.class);
+            intent.putExtra("position", position);
+            context.startActivity(intent);
+
+        }
 
 
 
