@@ -222,7 +222,7 @@ public class MainActivity extends AppCompatActivity {
             }}else if (requestCode==RC_PHOTO_PICKER && resultCode== RESULT_OK){
             //photo button was clicked
             Uri selectedImageUri=data.getData();
-            //Get a reference to store file at chat_photos/<fileName>
+            //Get a reference to store file at photos/<fileName>
             final StorageReference photoRef= imageRef.child(selectedImageUri.getLastPathSegment());
 
             //upload file to Firebase storage

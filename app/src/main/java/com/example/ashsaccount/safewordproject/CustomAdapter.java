@@ -90,6 +90,7 @@ public class CustomAdapter extends ArrayAdapter<RowData> {
             rowTextView.setText(singleItem.getText());
 
         }
+        Log.v("testing", "is row "+ position+" locked?"+ singleItem.getLock());
 
         if (singleItem.getLock() == true) {
 
@@ -99,6 +100,7 @@ public class CustomAdapter extends ArrayAdapter<RowData> {
             @Override
             public void onClick(View v) {
                 if (singleItem.getLock() == true) {
+
                    singleItem.setLock(false);
                     lockButton.setImageResource(R.drawable.unlocked);
                 }else {
@@ -111,6 +113,7 @@ public class CustomAdapter extends ArrayAdapter<RowData> {
     rowTextView.setOnClickListener(new View.OnClickListener() {
     @Override
     public void onClick(View v) {
+        Log.v("testing", "is row locked?"+ singleItem.getLock());
         if(singleItem.getLock()==true) {
             Intent intent = new Intent(context, InputPasswordActivity.class);
             intent.putExtra("position", position);
