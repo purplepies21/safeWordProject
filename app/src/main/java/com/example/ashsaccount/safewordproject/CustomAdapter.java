@@ -14,11 +14,13 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class CustomAdapter extends ArrayAdapter<RowData> {
 
-
+    static RowData singleItem;
+    static ArrayList<RowData> items;
     private Context context;
     public CustomAdapter(@NonNull Context context, int resource, List<RowData> objects) {
         super(context,R.layout.custom_row, objects);
@@ -28,11 +30,11 @@ public class CustomAdapter extends ArrayAdapter<RowData> {
 
     @NonNull
     @Override
-    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+    public View getView(final int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         LayoutInflater inflater = LayoutInflater.from(getContext());
         View customView = ((Activity) getContext()).getLayoutInflater().inflate(R.layout.custom_row, parent, false);
 
-        final RowData singleItem = getItem(position);
+        singleItem = getItem(position);
         final ImageView lockButton = customView.findViewById(R.id.lockImage);
         TextView rowTextView = (TextView) customView.findViewById(R.id.rowText);
         ImageView image = (ImageView) customView.findViewById(R.id.itemImage);
@@ -94,17 +96,19 @@ rowTextView.setOnClickListener(new View.OnClickListener() {
     @Override
     public void onClick(View v) {
 Intent intent=new Intent(context, InputPasswordActivity.class);
-intent.putExtra("singleItemText", singleItem.getText());
-if(singleItem.getPhotoUrl()!=null) {
-    intent.putExtra("singleItemImage", singleItem.getPhotoUrl());
+intent.putExtra("position", position);
+context.startActivity(intent);
 
-}
+
+
     }
 });
 
         return customView;
 
     }
+
+
 
 
 

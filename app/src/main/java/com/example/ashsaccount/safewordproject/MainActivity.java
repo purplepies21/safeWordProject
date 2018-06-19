@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -41,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int RC_SIGN_IN = 123;
     private ChildEventListener childEventListener;
-    CustomAdapter customAdapter;
+    static CustomAdapter customAdapter;
     ListView messageListView;
     FloatingActionButton imageButton;
     ImageButton lockButton;
@@ -58,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
     private StorageReference imageRef;
     private StorageReference textRef;
     private Handler handler;
+    public static ArrayList<RowData> rowData;
 
 
 
@@ -82,9 +84,8 @@ public class MainActivity extends AppCompatActivity {
 
         firebaseAuth = FirebaseAuth.getInstance();
         setContentView(R.layout.activity_main);
-        final List<RowData> rowData = new ArrayList<>();
+         rowData = new ArrayList<RowData>();
         StorageReference storageReference;
-        customAdapter = new CustomAdapter(this,R.layout.custom_row, rowData);
         ///
         handler = new Handler();
         databaseReference=firebaseDatabase.getReference().child("/users").child(firebaseAuth.getUid()).child("files");
@@ -93,8 +94,14 @@ public class MainActivity extends AppCompatActivity {
         ///
 
         messageListView = (ListView) findViewById(R.id.listView);
-        messageListView.setAdapter(customAdapter);
+
+
+
+
         attachDatabaseReadListener();
+        customAdapter = new CustomAdapter(this,R.layout.custom_row, rowData);
+        messageListView.setAdapter(customAdapter);
+
 
         imageButton = (FloatingActionButton) findViewById(R.id.fab);
 
@@ -256,7 +263,9 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                     RowData row= dataSnapshot.getValue(RowData.class);
+
                     customAdapter.add(row);
+                    Log.v("potato",rowData.get(rowData.size()).getText());
                 }
 
                 @Override
@@ -293,6 +302,12 @@ public class MainActivity extends AppCompatActivity {
         RowData rowData= new RowData("Hello!", mUsername, null,  true);
         databaseReference.push().setValue(rowData);
         // Clear input box
+
+    }
+
+    final public RowData getRow(int i){
+
+        return rowData.get(i);
 
     }
 }

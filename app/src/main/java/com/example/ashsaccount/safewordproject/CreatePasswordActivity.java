@@ -17,6 +17,8 @@ public class CreatePasswordActivity extends AppCompatActivity{
 
     PatternLockView patternLockView;
 
+
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,4 +54,5 @@ public class CreatePasswordActivity extends AppCompatActivity{
         }
     });
     }
+
 }

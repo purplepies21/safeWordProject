@@ -19,6 +19,7 @@
         </activity>
         <activity android:name=".CreatePasswordActivity"></activity>
         <activity android:name=".InputPasswordActivity"/>
+        <activity android:name=".FileActivity"/>
 
 
     </application>

@@ -15,13 +15,18 @@ import java.util.List;
 
 public class InputPasswordActivity extends AppCompatActivity{
 
-    PatternLockView mPatternLockView;
-    String password;
+
+
+   private PatternLockView mPatternLockView;
+   private String password;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_input_password);
+        Intent intentRecovery= getIntent();
+        final int position=intentRecovery.getExtras().getInt("position");
         final SharedPreferences preferences= getSharedPreferences("PREFS",0);
         password=preferences.getString("password","0");
 
@@ -44,7 +49,8 @@ public class InputPasswordActivity extends AppCompatActivity{
 
 
                     Intent intent = new Intent(getApplicationContext(), FileActivity.class);
-                    startActivity(intent);
+                    intent.putExtra("position", position);
+                    InputPasswordActivity.this.startActivity(intent);
                     finish();
                 }else{
 
