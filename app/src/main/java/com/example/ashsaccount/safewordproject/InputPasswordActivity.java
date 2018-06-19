@@ -72,12 +72,19 @@ public class InputPasswordActivity extends AppCompatActivity {
 
         final SharedPreferences preferences = getSharedPreferences("PREFS", 0);
         password = preferences.getString("password", "0");
+        if(password.equals("0")){
+            Intent intent = new Intent(getApplicationContext(), CreatePasswordActivity.class);
+            intent.putExtra("position", position);
+            InputPasswordActivity.this.startActivity(intent);
+            finish();
+        }
 
 
         mPatternLockView = (PatternLockView) findViewById(R.id.pattern_lock_view);
         mPatternLockView.addPatternLockListener(new PatternLockViewListener() {
             @Override
             public void onStarted() {
+
 
             }
 
@@ -114,7 +121,6 @@ public class InputPasswordActivity extends AppCompatActivity {
 
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            //Get an instance of KeyguardManager and FingerprintManager//
             keyguardManager =
                     (KeyguardManager) getSystemService(KEYGUARD_SERVICE);
             fingerprintManager =
@@ -124,24 +130,18 @@ public class InputPasswordActivity extends AppCompatActivity {
 
             //Check whether the device has a fingerprint sensor//
             if (!fingerprintManager.isHardwareDetected()) {
-                // If a fingerprint sensor isn’t available, then inform the user that they’ll be unable to use your app’s fingerprint functionality//
                 fingerImage.setVisibility(View.GONE);
 
             }
-            //Check whether the user has granted your app the USE_FINGERPRINT permission//
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.USE_FINGERPRINT) != PackageManager.PERMISSION_GRANTED) {
                 fingerImage.setVisibility(View.GONE);
             }
 
-            //Check that the user has registered at least one fingerprint//
             if (!fingerprintManager.hasEnrolledFingerprints()) {
-                // If the user hasn’t configured any fingerprints, then display the following message//
                 fingerImage.setVisibility(View.GONE);
             }
 
-            //Check that the lockscreen is secured//
             if (!keyguardManager.isKeyguardSecure()) {
-                // If the user hasn’t secured their lockscreen with a PIN password or pattern, then display the following text//
                 fingerImage.setVisibility(View.GONE);
             } else {
                 try {
@@ -151,11 +151,9 @@ public class InputPasswordActivity extends AppCompatActivity {
                 }
 
                 if (initCipher()) {
-                    //If the cipher is initialized successfully, then create a CryptoObject instance//
                     cryptoObject = new FingerprintManager.CryptoObject(cipher);
 
-                    // Here, I’m referencing the FingerprintHandler class that we’ll create in the next section. This class will be responsible
-                    // for starting the authentication process (via the startAuth method) and processing the authentication process events//
+
                     FingerprintHandler helper = new FingerprintHandler(this);
                     helper.startAuth(fingerprintManager, cryptoObject);
                 }
@@ -166,7 +164,6 @@ public class InputPasswordActivity extends AppCompatActivity {
 
     public boolean initCipher() {
         try {
-            //Obtain a cipher instance and configure it with the properties required for fingerprint authentication//
             cipher = Cipher.getInstance(
                     KeyProperties.KEY_ALGORITHM_AES + "/"
                             + KeyProperties.BLOCK_MODE_CBC + "/"
@@ -202,31 +199,24 @@ public class InputPasswordActivity extends AppCompatActivity {
 
     private void generateKey() throws FingerprintException {
         try {
-            // Obtain a reference to the Keystore using the standard Android keystore container identifier (“AndroidKeystore”)//
             keyStore = KeyStore.getInstance("AndroidKeyStore");
 
-            //Generate the key//
             keyGenerator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore");
 
-            //Initialize an empty KeyStore//
             keyStore.load(null);
 
-            //Initialize the KeyGenerator//
             keyGenerator.init(new
 
-                    //Specify the operation(s) this key can be used for//
                     KeyGenParameterSpec.Builder(KEY_NAME,
                     KeyProperties.PURPOSE_ENCRYPT |
                             KeyProperties.PURPOSE_DECRYPT)
                     .setBlockModes(KeyProperties.BLOCK_MODE_CBC)
 
-                    //Configure this key so that the user has to confirm their identity with a fingerprint each time they want to use it//
                     .setUserAuthenticationRequired(true)
                     .setEncryptionPaddings(
                             KeyProperties.ENCRYPTION_PADDING_PKCS7)
                     .build());
 
-            //Generate the key//
             keyGenerator.generateKey();
 
         } catch (KeyStoreException
@@ -243,8 +233,12 @@ public class InputPasswordActivity extends AppCompatActivity {
 
     public void success(int position) {
 
+       RowData row = MainActivity.customAdapter.getSingleItem(position);
+       row.setLock(false);
 
-        Intent intent = new Intent(getApplicationContext(), FileActivity.class);
+       MainActivity.customAdapter.setSingleItem(row, position);
+       MainActivity.updateName(row.getFileID(), row.getText(), row.getPhotoUrl(), row.getLock());
+        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
         intent.putExtra("position", position);
         InputPasswordActivity.this.startActivity(intent);
         finish();

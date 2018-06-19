@@ -6,7 +6,7 @@ public class RowData {
     private String photoUrl;
     private String fileUrl;
     private boolean lockRow;
-    private String userID;
+    private String fileID;
     public RowData() {
     }
 
@@ -43,12 +43,12 @@ public class RowData {
         this.photoUrl = photoUrl;
     }
 
-    public String getFileUrl() {
-        return fileUrl;
+    public String getFileID() {
+        return fileID;
     }
 
-    public void setFileUrl(String fileUrl) {
-        this.fileUrl = fileUrl;
+    public void setFileID(String fileID) {
+        this.fileID = fileID;
     }
     public boolean getLock() {
         return lockRow;

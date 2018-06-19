@@ -13,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -50,11 +51,11 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    private FirebaseAuth firebaseAuth;
+    private static FirebaseAuth firebaseAuth;
     private FirebaseAuth.AuthStateListener authStateListener;
-    private FirebaseStorage firebaseStorage;
+    private static FirebaseStorage firebaseStorage;
     private FirebaseDatabase firebaseDatabase;
-    private String mUsername;
+    private static String mUsername;
     private DatabaseReference databaseReference;
     private StorageReference imageRef;
     private StorageReference textRef;
@@ -64,11 +65,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //TODO Lock specific files from being accessed without fingerprint or pin authentication
-
         String[] tempArray = {"abc", "123", "456", "yfgvc",};
 
         mUsername = ANONYMOUS;
-        /////////////SETUP FOR LOLLIPIN (pin/fingerprint reading Library)//////
          firebaseDatabase=FirebaseDatabase.getInstance().getInstance();
 
         ///////////////////////////
@@ -100,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
             textRef = firebaseStorage.getReference().child("user").child(firebaseAuth.getUid()).child("textFiles");
 
             imageRef = firebaseStorage.getReference().child("user").child(firebaseAuth.getUid()).child("images");
-            attachDatabaseReadListener();
+
         }catch(NullPointerException e)
         {
 //            databaseReference = firebaseDatabase.getReference().child("/users").child("Unauthorized").child("files");
@@ -112,7 +111,8 @@ public class MainActivity extends AppCompatActivity {
         }        ///
 
         customAdapter = new CustomAdapter(this);
-        messageListView.setAdapter(customAdapter);
+        customAdapter.clear();
+
 
 
 
@@ -162,6 +162,23 @@ public class MainActivity extends AppCompatActivity {
                                        }
         );
 
+        messageListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                RowData row= customAdapter.getSingleItem(position);
+                customAdapter.showUpdateDialog(row.getFileID(),row.getText());
+                return false;
+            }
+        });
+
+
+    }
+
+    public static void updateName(String id, String name, String photoURL, boolean locked){
+        DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReference().child("/users").child(firebaseAuth.getUid()).child("files").child(id);
+        RowData row =new RowData(name, mUsername, photoURL, locked);
+        databaseReference.setValue(row);
+        Toast.makeText(customAdapter.getContext(), "Name updated successfully!",Toast.LENGTH_LONG).show();
 
     }
     @Override
@@ -197,7 +214,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+
         firebaseAuth.addAuthStateListener(authStateListener);
+        customAdapter.clear();
+
+        messageListView.setAdapter(customAdapter);
+
+
     }
     @Override
     protected void onPause() {
@@ -206,7 +229,10 @@ public class MainActivity extends AppCompatActivity {
             firebaseAuth.removeAuthStateListener(authStateListener);
         }
         detachDatabaseReadListener();
+        messageListView.setAdapter(null);
+
         customAdapter.clear();
+
     }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -247,13 +273,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void onSignedOutCleanup(){
+
         mUsername=ANONYMOUS;
         customAdapter.clear();
     }
 
     private void onSignedInInitialize(String displayName) {
-        mUsername=displayName;
+        customAdapter.clear();
 
+        mUsername=displayName;
+attachDatabaseReadListener();
     }
     private void attachDatabaseReadListener(){
         if(childEventListener==null) {
@@ -261,13 +290,20 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                     RowData row = dataSnapshot.getValue(RowData.class);
+                    row.setFileID(dataSnapshot.getKey());
                     customAdapter.addItem(row);
+
                 }
 
                 @Override
                 public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
 
 
+
+
+
+
+                customAdapter.notifyDataSetChanged();
                 }
 
                 @Override
@@ -290,6 +326,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }    private void detachDatabaseReadListener() {
         if(childEventListener!=null) {
+
             childEventListener=null;
 
         }
@@ -298,6 +335,24 @@ public class MainActivity extends AppCompatActivity {
         RowData rowData= new RowData("Hello!", mUsername, null,  true);
         databaseReference.push().setValue(rowData);
         // Clear input box
+
+    }
+
+    public static void deleteItem(String fileID, String photoURL) {
+
+        DatabaseReference drFile= FirebaseDatabase.getInstance().getReference("users").child(firebaseAuth.getUid()).child("files").child(fileID);
+       if(photoURL!=null){
+        StorageReference photoRef = firebaseStorage.getReferenceFromUrl(photoURL);
+
+        photoRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Toast.makeText(customAdapter.getContext(), "File deleted successfully from storage", Toast.LENGTH_SHORT).show();
+            }
+        });}
+        drFile.removeValue();
+
+
 
     }
 }

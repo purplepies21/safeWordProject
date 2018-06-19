@@ -20,7 +20,6 @@ public class FingerprintHandler extends FingerprintManager.AuthenticationCallbac
         context = mContext;
     }
 
-    //Implement the startAuth method, which is responsible for starting the fingerprint authentication process//
 
     public void startAuth(FingerprintManager manager, FingerprintManager.CryptoObject cryptoObject) {
 
@@ -36,7 +35,6 @@ public class FingerprintHandler extends FingerprintManager.AuthenticationCallbac
     public void onAuthenticationError(int errMsgId, CharSequence errString) {
 
 
-        Toast.makeText(context, "Authentication error\n" + errString, Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -53,7 +51,6 @@ public class FingerprintHandler extends FingerprintManager.AuthenticationCallbac
         Toast.makeText(context, "Authentication help\n" + helpString, Toast.LENGTH_LONG).show();
     }@Override
 
-    //onAuthenticationSucceeded is called when a fingerprint has been successfully matched to one of the fingerprints stored on the user’s device//
     public void onAuthenticationSucceeded(
             FingerprintManager.AuthenticationResult result) {
 
@@ -64,5 +61,6 @@ public class FingerprintHandler extends FingerprintManager.AuthenticationCallbac
 
 
     }
+
 
 }

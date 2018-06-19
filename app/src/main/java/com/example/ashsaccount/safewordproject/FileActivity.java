@@ -24,7 +24,6 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 public class FileActivity extends AppCompatActivity{
-private TextView mainTextView;
     private TextView fileNameTextView;
     private RowData row;
     private int position;
@@ -40,7 +39,7 @@ private TextView mainTextView;
         StorageReference imageRef = firebaseStorage.getReference().child("user").child(firebaseAuth.getUid()).child("images");
 
         Intent intent= getIntent();
-        mainTextView=findViewById(R.id.editText);
+
         fileNameTextView= findViewById(R.id.textView);
         image= findViewById(R.id.imageView2);
 
@@ -55,8 +54,8 @@ private TextView mainTextView;
 
 
        row = MainActivity.customAdapter.getSingleItem(position);
+       fileNameTextView.setText(row.getText());
             if (row.getPhotoUrl() != null) {
-                mainTextView.setVisibility(View.GONE);
 
                     Glide.with(image.getContext())
                             .load(row.getPhotoUrl())
@@ -65,8 +64,7 @@ private TextView mainTextView;
 
 
             } else {
-                mainTextView.setVisibility(View.VISIBLE);
-                mainTextView.setVisibility(View.GONE);
+
 
             }
 
