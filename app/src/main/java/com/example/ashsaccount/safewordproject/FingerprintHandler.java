@@ -57,6 +57,23 @@ public class FingerprintHandler extends FingerprintManager.AuthenticationCallbac
         Toast.makeText(context, "Success!", Toast.LENGTH_LONG).show();
         Intent intent = new Intent(context, FileActivity.class);
         intent.putExtra("position", InputPasswordActivity.pos);
+
+        intent.putExtra("adapterType",InputPasswordActivity.adapterType);
+        boolean adapterType= InputPasswordActivity.adapterType;
+        int position= InputPasswordActivity.pos;
+        RowData row;
+        if(adapterType==false) {
+            row = MainActivity.customAdapter.getSingleItem(position);
+            row.setLock(false);
+
+            MainActivity.customAdapter.setSingleItem(row, position);
+        }else {
+            row = MainActivity.gridViewAdapter.getSingleItem(position);
+            row.setLock(false);
+            MainActivity.gridViewAdapter.setSingleItem(row, position);
+        }
+            MainActivity.updateItem(row.getFileID(), row.getText(), row.getPhotoUrl(), row.getLock());
+
         context.startActivity(intent);
 
 

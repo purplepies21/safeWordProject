@@ -21,7 +21,6 @@
         <activity android:name=".InputPasswordActivity"/>
         <activity android:name=".FileActivity"/>
 
-
     </application>
     <uses-feature android:name="android.hardware.fingerprint"
         android:required="true"/>

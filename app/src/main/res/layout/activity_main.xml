@@ -11,10 +11,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_margin="@dimen/fab_margin"
-        android:layout_marginBottom="27dp"
-        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="14dp"
+        android:layout_toEndOf="@+id/seekBar"
         android:clickable="true"
         app:backgroundTint="?attr/colorPrimaryDark"
         app:fabSize="normal"
@@ -23,6 +21,7 @@
 
     <SeekBar
         android:id="@+id/seekBar"
+        style="@style/Widget.AppCompat.SeekBar"
         android:layout_width="137dp"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -30,15 +29,21 @@
         android:layout_marginBottom="210dp"
         android:visibility="invisible" />
 
-    <ListView
-        android:id="@+id/listView"
+    <ViewStub
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:gravity="center"
-        tools:listitem="@layout/custom_row">
+        android:layout_height="wrap_content"
+        android:id="@+id/stub_grid"
+        android:inflatedId="@+id/showlayout"
+        android:layout="@layout/my_gridview"
+        />
+    <ViewStub
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/stub_list"
+        android:inflatedId="@+id/showlayout"
+        android:layout="@layout/my_listview"
+        />
 
 
-    </ListView>
+
 </RelativeLayout>

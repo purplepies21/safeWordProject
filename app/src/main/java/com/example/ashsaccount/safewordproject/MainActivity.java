@@ -1,6 +1,13 @@
+/*
+* This class contains the bulk of the app. Using Firebase authenticator, Firebase Storage and Firebase database in order to populate the custom gridView or listview. before reaching activity_main, authenticator asks the user to log in and remembers the user.
+* Added a button in the menu that allows the user to switch views from listView GridView and vice-versa.
+* This app allows the user to upload images to the cloud and lock them from being viewed by those who are not supposed to see them (kids or friends that are using your phone but are a bit too snoopy)
+* With fingerprint authenication and/or Pattern authenication, the user can feel that their photos are safe from prying eyes.
+* */
 package com.example.ashsaccount.safewordproject;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -13,11 +20,12 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewStub;
 import android.widget.AdapterView;
+import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
@@ -34,9 +42,7 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -44,12 +50,23 @@ public class MainActivity extends AppCompatActivity {
     public static final String ANONYMOUS = "anonymous";
 //    public static final String REQUEST_CODE_ENABLE= "requestCode";
 
+
+    ////////////
+
+    private ViewStub stubGrid;
+    private ViewStub stubList;
+    private GridView gridView;
+    public static GridAdapter gridViewAdapter;
+    private static int currentViewMode=0;
+
+    static final int VIEW_MODE_LISTVIEW = 0;
+    static final int VIEW_MODE_GRIDVEIW=1;
+
     private static final int RC_SIGN_IN = 123;
     private ChildEventListener childEventListener;
     public static CustomAdapter customAdapter;
     ListView messageListView;
     FloatingActionButton imageButton;
-    ImageButton lockButton;
     private static final int RC_PHOTO_PICKER =  2;
 
 
@@ -71,11 +88,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 //TODO Lock specific files from being accessed without fingerprint or pin authentication
         String[] tempArray = {"abc", "123", "456", "yfgvc",};
-
         mUsername = ANONYMOUS;
          firebaseDatabase=FirebaseDatabase.getInstance().getInstance();
-
         ///////////////////////////
+
+
+        SharedPreferences sharedPreferences= getSharedPreferences("ViewMode", MODE_PRIVATE);
+        currentViewMode=sharedPreferences.getInt("currentViewMode", VIEW_MODE_LISTVIEW);
+
 
 
         firebaseStorage = FirebaseStorage.getInstance();
@@ -84,7 +104,10 @@ public class MainActivity extends AppCompatActivity {
 
         firebaseAuth = FirebaseAuth.getInstance();
         setContentView(R.layout.activity_main);
-
+        stubList=findViewById(R.id.stub_list);
+        stubGrid=findViewById(R.id.stub_grid);
+        stubGrid.inflate();
+        stubList.inflate();
         //rowData = new ArrayList<RowData>();
 
         StorageReference storageReference;
@@ -93,8 +116,8 @@ public class MainActivity extends AppCompatActivity {
 
         progressBar=findViewById(R.id.seekBar);
 
-        messageListView = (ListView) findViewById(R.id.listView);
-
+        messageListView = (ListView) findViewById(R.id.mylistview);
+        gridView=(GridView)findViewById(R.id.mygridview);
 
 
 
@@ -104,6 +127,7 @@ public class MainActivity extends AppCompatActivity {
             textRef = firebaseStorage.getReference().child("user").child(firebaseAuth.getUid()).child("textFiles");
 
             imageRef = firebaseStorage.getReference().child("user").child(firebaseAuth.getUid()).child("images");
+
 
         }catch(NullPointerException e)
         {
@@ -115,9 +139,20 @@ public class MainActivity extends AppCompatActivity {
 
         }        ///
 
-        customAdapter = new CustomAdapter(this);
-        customAdapter.clear();
+        if(VIEW_MODE_LISTVIEW==currentViewMode) {
+            customAdapter = new CustomAdapter(this);
+          if(gridViewAdapter!=null) {
+              gridViewAdapter.clear();
 
+          }
+          }else{
+           if(customAdapter!=null) {
+               customAdapter.clear();
+           }
+            gridViewAdapter = new GridAdapter(this);
+
+        }
+        switchView();
 
 
 
@@ -166,12 +201,41 @@ public class MainActivity extends AppCompatActivity {
                                            }
                                        }
         );
+//This listener is to open the menu that can edit each file.
 
         messageListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                RowData row= customAdapter.getSingleItem(position);
-                customAdapter.showUpdateDialog(row.getFileID(),row.getText());
+
+                if(VIEW_MODE_LISTVIEW==currentViewMode) {
+
+                    RowData row = customAdapter.getSingleItem(position);
+
+                    customAdapter.showUpdateDialog(row.getFileID(), row.getText(), position);
+                }else{
+
+                    RowData row = gridViewAdapter.getSingleItem(position);
+
+                    gridViewAdapter.showUpdateDialog(row.getFileID(), row.getText(),position);
+                }
+                return false;
+            }
+        });
+        gridView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+
+                if(VIEW_MODE_LISTVIEW==currentViewMode) {
+
+                    RowData row = customAdapter.getSingleItem(position);
+
+                    customAdapter.showUpdateDialog(row.getFileID(), row.getText(),position);
+                }else{
+
+                    RowData row = gridViewAdapter.getSingleItem(position);
+
+                    gridViewAdapter.showUpdateDialog(row.getFileID(), row.getText(),position);
+                }
                 return false;
             }
         });
@@ -183,8 +247,12 @@ public class MainActivity extends AppCompatActivity {
         DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReference().child("/users").child(firebaseAuth.getUid()).child("files").child(id);
         RowData row =new RowData(name, mUsername, photoURL, locked);
         databaseReference.setValue(row);
-        Toast.makeText(customAdapter.getContext(), " updated successfully!",Toast.LENGTH_LONG).show();
+        if(VIEW_MODE_LISTVIEW==currentViewMode) {
+            Toast.makeText(customAdapter.getContext(), " updated successfully!", Toast.LENGTH_LONG).show();
+        }else{
+            Toast.makeText(gridViewAdapter.getContext(), " updated successfully!", Toast.LENGTH_LONG).show();
 
+        }
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -194,15 +262,29 @@ public class MainActivity extends AppCompatActivity {
 
     }
     @Override
+    //This method is to ensure all
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.sign_out_menu:
                 //sign out
                 AuthUI.getInstance().signOut(this);
                 return true;
-            case R.id.new_text_file_menu:
-                uploadData();
-                return true;
+            case R.id.swapView:
+                if(VIEW_MODE_LISTVIEW==currentViewMode){
+                    currentViewMode=VIEW_MODE_GRIDVEIW;
+
+
+                }else{
+                    currentViewMode=VIEW_MODE_LISTVIEW;
+
+                }
+
+                SharedPreferences sharedPreferences = getSharedPreferences("ViewMode", MODE_PRIVATE);
+                SharedPreferences.Editor editor= sharedPreferences.edit();
+                editor.putInt("currentViewMode",currentViewMode);
+                editor.commit();
+                switchView();
+                break;
             case R.id.new_pin_menu:
                 Intent intent= new Intent(getApplicationContext(), CreatePasswordActivity.class);
                 startActivity(intent);
@@ -214,6 +296,42 @@ public class MainActivity extends AppCompatActivity {
 
 
         }
+        return true;
+    }
+
+    private void switchView()  {
+        if(VIEW_MODE_LISTVIEW==currentViewMode) {
+            stubList.setVisibility(View.VISIBLE);
+            stubGrid.setVisibility(View.GONE);
+        }else{
+            stubList.setVisibility(View.GONE);
+            stubGrid.setVisibility(View.VISIBLE);
+
+
+        }
+        setAdapters();
+
+
+
+    }
+
+    private void setAdapters() {
+        if(VIEW_MODE_LISTVIEW==currentViewMode) {
+
+
+           customAdapter= new CustomAdapter(this);
+            messageListView.setAdapter(customAdapter);
+
+            customAdapter.notifyDataSetChanged();
+
+        }else{
+
+            gridViewAdapter= new GridAdapter(this);
+            gridView.setAdapter(gridViewAdapter);
+            gridViewAdapter.notifyDataSetChanged();
+        }
+//        onSignedInInitialize(mUsername);
+
     }
 
     @Override
@@ -221,9 +339,7 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
 
         firebaseAuth.addAuthStateListener(authStateListener);
-        customAdapter.clear();
-
-        messageListView.setAdapter(customAdapter);
+attachDatabaseReadListener();
 
 
     }
@@ -235,9 +351,16 @@ public class MainActivity extends AppCompatActivity {
         }
         detachDatabaseReadListener();
         messageListView.setAdapter(null);
-
+//        if(VIEW_MODE_LISTVIEW==currentViewMode) {
+//
+//            customAdapter.clear();
+//        }else {
+//            gridViewAdapter.clear();
+//        }
 
     }
+
+    //handles ActivityResults. the 3 used so far are for when the user signs in, signs out, or uploads an image.
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -258,6 +381,7 @@ public class MainActivity extends AppCompatActivity {
             //upload file to Firebase storage
             photoRef.putFile(selectedImageUri).addOnSuccessListener(this, new OnSuccessListener<UploadTask.TaskSnapshot>() {
 
+
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                   progressBar.setVisibility(View.INVISIBLE);
@@ -277,6 +401,7 @@ public class MainActivity extends AppCompatActivity {
             }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                //progressbar for uploading images to the database
                     double progress = (100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
                     System.out.println("upload is "+progress+"% done");
                     int currentProgress=(int)progress;
@@ -290,19 +415,26 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
-
+//clears the adapters after the user has signed out.
     private void onSignedOutCleanup(){
 
         mUsername=ANONYMOUS;
-        customAdapter.clear();
-    }
+        if(VIEW_MODE_LISTVIEW==currentViewMode) {
 
+            customAdapter.clear();
+        }else {
+            gridViewAdapter.clear();
+        }
+    }
+//prepares the activity to be populated after the user has signed in.
     private void onSignedInInitialize(String displayName) {
 
 
         mUsername=displayName;
 attachDatabaseReadListener();
     }
+
+    //keeps track of and refreshes data when the database is updated. populates the adapters.
     private void attachDatabaseReadListener(){
         if(childEventListener==null) {
             childEventListener = new ChildEventListener() {
@@ -312,9 +444,19 @@ attachDatabaseReadListener();
 
 
                     row.setFileID(dataSnapshot.getKey());
-                    if(customAdapter.hasItemWithFileId(row.getFileID())) {
-                        customAdapter.addItem(row);
+                    if(VIEW_MODE_LISTVIEW==currentViewMode) {
+
+                        if(customAdapter.hasItemWithFileId(row.getFileID())) {
+                            customAdapter.addItem(row);
+                        customAdapter.notifyDataSetChanged();
+                        }
+                    }else{
+                        if(gridViewAdapter.hasItemWithFileId(row.getFileID())) {
+                            gridViewAdapter.addItem(row);
+                        gridViewAdapter.notifyDataSetChanged();
                     }
+                }
+
                 }
 
                 @Override
@@ -324,12 +466,27 @@ attachDatabaseReadListener();
 
 
 
+                    if(VIEW_MODE_LISTVIEW==currentViewMode) {
 
-                customAdapter.notifyDataSetChanged();
+                        customAdapter.notifyDataSetChanged();
+                    }else {
+                        gridViewAdapter.notifyDataSetChanged();
+
+                    }
                 }
 
                 @Override
                 public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+
+                    if(VIEW_MODE_LISTVIEW==currentViewMode) {
+
+                        customAdapter.notifyDataSetChanged();
+                    }else {
+                        gridViewAdapter.notifyDataSetChanged();
+
+                    }
+
 
                 }
 
@@ -342,25 +499,29 @@ attachDatabaseReadListener();
                 public void onCancelled(@NonNull DatabaseError databaseError) {
 
                 }
-            }; databaseReference.addChildEventListener(childEventListener);
-
+            };  if(databaseReference!=null) {
+                databaseReference.addChildEventListener(childEventListener);
+            }
 
         }
     }    private void detachDatabaseReadListener() {
         if(childEventListener!=null) {
-
+databaseReference.removeEventListener(childEventListener);
             childEventListener=null;
 
         }
     }
-    private void uploadData(){
-        RowData rowData= new RowData("Hello!", mUsername, null,  true);
-        databaseReference.push().setValue(rowData);
-        // Clear input box
 
-    }
+    //this method was used for testing. not necessary to keep around but kept it commented out in order to check in future use.
+//    private void uploadData(){
+//        RowData rowData= new RowData("Hello!", mUsername, null,  true);
+//        databaseReference.push().setValue(rowData);
+//        // Clear input box
+//
+//    }
 
-    public static void deleteItem(String fileID, String photoURL) {
+// this method deletes data from the database and the image from firebase storage that is linked by that database.
+    public static void deleteItem(String fileID, String photoURL, int position) {
 
         DatabaseReference drFile= FirebaseDatabase.getInstance().getReference("users").child(firebaseAuth.getUid()).child("files").child(fileID);
        if(photoURL!=null){
@@ -369,7 +530,13 @@ attachDatabaseReadListener();
         photoRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
-                Toast.makeText(customAdapter.getContext(), "File deleted successfully from storage", Toast.LENGTH_SHORT).show();
+                if(VIEW_MODE_LISTVIEW==currentViewMode) {
+
+                    Toast.makeText(customAdapter.getContext(), "File deleted successfully from storage", Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(gridViewAdapter.getContext(), "File deleted successfully from storage", Toast.LENGTH_SHORT).show();
+
+                }
             }
         });}
         drFile.removeValue();

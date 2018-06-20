@@ -1,3 +1,5 @@
+//RowData holds the information needed for  a single file. used in the items arrayList contained in the GridAdapter and CusomAdapter.
+
 package com.example.ashsaccount.safewordproject;
 
 public class RowData {
@@ -18,7 +20,7 @@ public class RowData {
         this.photoUrl = photoUrl;
         lockRow=locked;
     }
-
+//simple getter for
     public String getText() {
         return text;
     }

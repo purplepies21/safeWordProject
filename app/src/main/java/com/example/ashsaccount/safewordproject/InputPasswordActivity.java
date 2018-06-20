@@ -39,12 +39,12 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 
 public class InputPasswordActivity extends AppCompatActivity {
-
+//variables that are static are referenced in another activity.
 
     private PatternLockView mPatternLockView;
     private String password;
     ImageView fingerImage;
-
+public static boolean adapterType;
     ////////FINGERPRINT STUFF\\\\\\\\\\\\\\
     private static final String KEY_NAME = "yourKey";
     private Cipher cipher;
@@ -66,6 +66,7 @@ public class InputPasswordActivity extends AppCompatActivity {
         final int position = intentRecovery.getExtras().getInt("position");
         pos = position;
 
+        adapterType= intentRecovery.getExtras().getBoolean("adapterType");
         fingerPrintOnCreate();
 
         final SharedPreferences preferences = getSharedPreferences("PREFS", 0);
@@ -76,6 +77,7 @@ public class InputPasswordActivity extends AppCompatActivity {
             InputPasswordActivity.this.startActivity(intent);
             finish();
         }
+
 
 
         mPatternLockView = (PatternLockView) findViewById(R.id.pattern_lock_view);
@@ -230,14 +232,23 @@ public class InputPasswordActivity extends AppCompatActivity {
 
 
     public void success(int position) {
+        RowData row;
+        if(adapterType==false) {
+     row = MainActivity.customAdapter.getSingleItem(position);
+    row.setLock(false);
 
-       RowData row = MainActivity.customAdapter.getSingleItem(position);
-       row.setLock(false);
+    MainActivity.customAdapter.setSingleItem(row, position);
+}else{
+     row = MainActivity.gridViewAdapter.getSingleItem(position);
+    row.setLock(false);
+    MainActivity.gridViewAdapter.setSingleItem(row,position);
 
-       MainActivity.customAdapter.setSingleItem(row, position);
+}
        MainActivity.updateItem(row.getFileID(), row.getText(), row.getPhotoUrl(), row.getLock());
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
         intent.putExtra("position", position);
+        intent.putExtra("adapterType",adapterType);
+
         InputPasswordActivity.this.startActivity(intent);
         finish();
     }

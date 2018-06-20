@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -26,15 +27,16 @@ import com.bumptech.glide.request.target.Target;
 
 import java.util.ArrayList;
 
-public class CustomAdapter extends ArrayAdapter<RowData> {
+public class GridAdapter extends ArrayAdapter<RowData>{
 
     private RowData singleItem;
     private ArrayList<RowData> items = new ArrayList<RowData>();
     private Context context;
     private ProgressBar progressBar;
+    //private int position;
 
-    public CustomAdapter(@NonNull Context context) {
-        super(context,R.layout.custom_row);
+    public GridAdapter(@NonNull Context context) {
+        super(context,R.layout.single_grid);
         this.context=context;
     }
 
@@ -79,23 +81,21 @@ public class CustomAdapter extends ArrayAdapter<RowData> {
     @Override
     public View getView(final int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         LayoutInflater inflater = LayoutInflater.from(getContext());
-        View customView = ((Activity) getContext()).getLayoutInflater().inflate(R.layout.custom_row, parent, false);
-
+        View customView = ((Activity) getContext()).getLayoutInflater().inflate(R.layout.single_grid, parent, false);
+progressBar=customView.findViewById(R.id.progressBar2);
         singleItem = getSingleItem(position);
-        progressBar=customView.findViewById(R.id.progressBar3);
-
         final ImageView lockButton = customView.findViewById(R.id.lockImage);
         TextView rowTextView = (TextView) customView.findViewById(R.id.rowText);
         ImageView image = (ImageView) customView.findViewById(R.id.itemImage);
         rowTextView.setText(singleItem.getText());
         image.setImageResource(R.drawable.lockedicon);
-     //   this.position=position;
+      //  this.position=position;
 
-        boolean isPhoto = getSingleItem(position).getPhotoUrl() != null;
+        boolean isPhoto = singleItem.getPhotoUrl() != null;
         if (isPhoto) {
             if (getSingleItem(position).getLock() == false) {
                 Glide.with(image.getContext())
-                        .load(getSingleItem(position).getPhotoUrl()).listener(new RequestListener<String, GlideDrawable>() {
+                        .load(singleItem.getPhotoUrl()).listener(new RequestListener<String, GlideDrawable>() {
                     @Override
                     public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
                         progressBar.setVisibility(View.GONE);
@@ -113,8 +113,7 @@ public class CustomAdapter extends ArrayAdapter<RowData> {
             }progressBar.setVisibility(View.GONE);
             rowTextView.setText(getSingleItem(position).getText());
         } else{
-
-
+            progressBar.setVisibility(View.GONE);
             Glide.with(image.getContext())
                     .load(R.drawable.txtthumb)
                     .into(image);
@@ -148,30 +147,32 @@ public class CustomAdapter extends ArrayAdapter<RowData> {
             }
         });
 
-    rowTextView.setOnClickListener(new View.OnClickListener() {
-    @Override
-    public void onClick(View v) {
-        Log.v("testing", "is row locked?"+ singleItem.getLock());
-        if(getSingleItem(position).getLock()==true) {
+        rowTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.v("testing", "is row locked?"+ getSingleItem(position).getLock());
+                if(getSingleItem(position).getLock()==true) {
 
-            Intent intent = new Intent(context, InputPasswordActivity.class);
-            intent.putExtra("position", position);
-            intent.putExtra("adapterType",false);
+                    Intent intent = new Intent(context, InputPasswordActivity.class);
+                    intent.putExtra("position", position);
+                    intent.putExtra("adapterType",true);
+                    context.startActivity(intent);
+                }else{
 
-            context.startActivity(intent);
-        }else{
-                Intent intent = new Intent(context, FileActivity.class);
-                intent.putExtra("position", position);
-                intent.putExtra("adapterType",false);
-
-                context.startActivity(intent);
-
-        }
+                        Intent intent = new Intent(context, FileActivity.class);
+                        intent.putExtra("position", position);
+                        intent.putExtra("adapterType",true);
+                        context.startActivity(intent);
 
 
 
-    }
-});
+
+                }
+
+
+
+            }
+        });
         image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -180,13 +181,13 @@ public class CustomAdapter extends ArrayAdapter<RowData> {
 
                     Intent intent = new Intent(context, InputPasswordActivity.class);
                     intent.putExtra("position", position);
-                    intent.putExtra("adapterType",false);
+                    intent.putExtra("adapterType",true);
                     context.startActivity(intent);
                 }else{
 
                     Intent intent = new Intent(context, FileActivity.class);
                     intent.putExtra("position", position);
-                    intent.putExtra("adapterType",false);
+                    intent.putExtra("adapterType",true);
                     context.startActivity(intent);
 
 
@@ -199,6 +200,7 @@ public class CustomAdapter extends ArrayAdapter<RowData> {
             }
         });
 
+        setSingleItem(getSingleItem(position), position);
         return customView;
 
     }
@@ -213,40 +215,32 @@ public class CustomAdapter extends ArrayAdapter<RowData> {
         final Button buttonDelete= (Button) dialogView.findViewById(R.id.buttonDelete);
 
         dialogBuilder.setTitle("Updating title "+getSingleItem(position).getText());
-       final  AlertDialog alertDialog = dialogBuilder.create();
+        final  AlertDialog alertDialog = dialogBuilder.create();
         alertDialog.show();
         buttonUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-            if(!editTextTitle.getText().toString().isEmpty()){
-                if(getSingleItem(position).getPhotoUrl()!=null) {
-                    MainActivity.updateItem(fileId, editTextTitle.getText().toString().trim(), getSingleItem(position).getPhotoUrl(), getSingleItem(position).getLock());
-                }else{
-                    MainActivity.updateItem(fileId,editTextTitle.getText().toString().trim(), null, getSingleItem(position).getLock());
+                if(!editTextTitle.getText().toString().isEmpty()){
+                    if(getSingleItem(position).getPhotoUrl()!=null) {
+                        MainActivity.updateItem(fileId, editTextTitle.getText().toString().trim(), getSingleItem(position).getPhotoUrl(), getSingleItem(position).getLock());
+                    }else{
+                        MainActivity.updateItem(fileId,editTextTitle.getText().toString().trim(), null, getSingleItem(position).getLock());
+
+                    }
+                    alertDialog.dismiss();
 
                 }
-                alertDialog.dismiss();
-
-            }
             }
         });
         buttonDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 MainActivity.deleteItem(getSingleItem(position).getFileID(), getSingleItem(position).getPhotoUrl(), position);
-
+                notifyDataSetChanged();
             }
         });
-        notifyDataSetChanged();
 
 
 
     }
-
-
-
-
-
-
-
 }

@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">safeWordProject</string>
     <string name="sign_out">sign out</string>
-    <string name="new_text_file_text">New Text File</string>
+    <string name="swap_view_text">Swap View</string>
     <string name="enter_text_here_hint">Enter text here</string>
     <string name="create_a_pin_text">Create a PIN</string>
     <string name="create_pattern_text">Create Pattern</string>
