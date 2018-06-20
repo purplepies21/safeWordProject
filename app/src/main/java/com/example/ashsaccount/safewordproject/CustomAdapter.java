@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -26,6 +27,7 @@ public class CustomAdapter extends ArrayAdapter<RowData> {
     private RowData singleItem;
     private ArrayList<RowData> items = new ArrayList<RowData>();
     private Context context;
+    private int position;
 
     public CustomAdapter(@NonNull Context context) {
         super(context,R.layout.custom_row);
@@ -42,6 +44,12 @@ public class CustomAdapter extends ArrayAdapter<RowData> {
     }
 
     @Override
+    public void clear() {
+        super.clear();
+        items.clear();
+    }
+
+    @Override
     public int getCount() {
         return items.size();
     }
@@ -50,6 +58,17 @@ public class CustomAdapter extends ArrayAdapter<RowData> {
         items.add(rowData);
         Log.v("potato", "adding row : " + rowData.getText());
         notifyDataSetChanged();
+    }
+
+    public boolean hasItemWithFileId(String id) {
+        for(RowData item : items){
+            if(item.getFileID()==id){
+                return false;
+
+            }
+
+        }
+        return true;
     }
 
     @NonNull
@@ -64,10 +83,11 @@ public class CustomAdapter extends ArrayAdapter<RowData> {
         ImageView image = (ImageView) customView.findViewById(R.id.itemImage);
         rowTextView.setText(singleItem.getText());
         image.setImageResource(R.drawable.lockedicon);
+        this.position=position;
 
         boolean isPhoto = singleItem.getPhotoUrl() != null;
         if (isPhoto) {
-            if (singleItem.getLock() == false) {
+            if (getSingleItem(position).getLock() == false) {
                 Glide.with(image.getContext())
                         .load(singleItem.getPhotoUrl())
                         .into(image);
@@ -82,11 +102,11 @@ public class CustomAdapter extends ArrayAdapter<RowData> {
 
 
 
-        if (singleItem.getText() != null) {
-            rowTextView.setText(singleItem.getText());
+        if (getSingleItem(position).getText() != null) {
+            rowTextView.setText(getSingleItem(position).getText());
 
         }
-        Log.v("testing", "is row "+ position+" locked?"+ singleItem.getLock());
+        Log.v("testing", "is row "+ position+" locked?"+ getSingleItem(position).getLock());
 
         if (singleItem.getLock() == true) {
             lockButton.setImageResource(R.drawable.locked);
@@ -94,11 +114,11 @@ public class CustomAdapter extends ArrayAdapter<RowData> {
         lockButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (singleItem.getLock() == true) {
+                if (getSingleItem(position).getLock() == true) {
                     Toast.makeText(context, "File is locked.",Toast.LENGTH_LONG).show();
 
                 }else {
-                    singleItem.setLock(true);
+                    getSingleItem(position).setLock(true);
                     MainActivity.updateItem(getSingleItem(position).getFileID(),getSingleItem(position).getText(),getSingleItem(position).getPhotoUrl(),getSingleItem(position).getLock());
                     lockButton.setImageResource(R.drawable.locked);
                     Toast.makeText(context, "File is now locked.",Toast.LENGTH_LONG).show();
@@ -111,16 +131,20 @@ public class CustomAdapter extends ArrayAdapter<RowData> {
     @Override
     public void onClick(View v) {
         Log.v("testing", "is row locked?"+ singleItem.getLock());
-        if(singleItem.getLock()==true) {
+        if(getSingleItem(position).getLock()==true) {
 
             Intent intent = new Intent(context, InputPasswordActivity.class);
             intent.putExtra("position", position);
             context.startActivity(intent);
         }else{
-            Intent intent = new Intent(context, FileActivity.class);
-            intent.putExtra("position", position);
-            context.startActivity(intent);
+            if(context.getResources().getConfiguration().orientation== Configuration.ORIENTATION_PORTRAIT) {
+                Intent intent = new Intent(context, FileActivity.class);
+                intent.putExtra("position", position);
+                context.startActivity(intent);
+            }else{
 
+
+            }
         }
 
 
@@ -142,7 +166,7 @@ public class CustomAdapter extends ArrayAdapter<RowData> {
         final Button buttonUpdate= (Button) dialogView.findViewById(R.id.buttonUpdate);
         final Button buttonDelete= (Button) dialogView.findViewById(R.id.buttonDelete);
 
-        dialogBuilder.setTitle("Updating title "+singleItem.getText());
+        dialogBuilder.setTitle("Updating title "+getSingleItem(position).getText());
        final  AlertDialog alertDialog = dialogBuilder.create();
         alertDialog.show();
         buttonUpdate.setOnClickListener(new View.OnClickListener() {

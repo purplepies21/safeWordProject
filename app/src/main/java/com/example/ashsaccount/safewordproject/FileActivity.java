@@ -1,5 +1,6 @@
 package com.example.ashsaccount.safewordproject;
 
+import android.app.Fragment;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -28,15 +29,13 @@ public class FileActivity extends AppCompatActivity{
     private RowData row;
     private int position;
     private ImageView image;
+
+    
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_file);
-        FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
-        FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
-        FirebaseDatabase firebaseDatabase=FirebaseDatabase.getInstance().getInstance();
-        StorageReference  textRef = firebaseStorage.getReference().child("user").child(firebaseAuth.getUid()).child("textFiles");;
-        StorageReference imageRef = firebaseStorage.getReference().child("user").child(firebaseAuth.getUid()).child("images");
+
 
         Intent intent= getIntent();
 

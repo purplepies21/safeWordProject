@@ -17,6 +17,7 @@ import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
@@ -76,7 +77,6 @@ public class MainActivity extends AppCompatActivity {
 
         ///////////////////////////
 
-        progressBar=findViewById(R.id.seekBar);
 
         firebaseStorage = FirebaseStorage.getInstance();
 
@@ -91,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
         ///
         handler = new Handler();
 
+        progressBar=findViewById(R.id.seekBar);
 
         messageListView = (ListView) findViewById(R.id.listView);
 
@@ -235,7 +236,6 @@ public class MainActivity extends AppCompatActivity {
         detachDatabaseReadListener();
         messageListView.setAdapter(null);
 
-        customAdapter.clear();
 
     }
     @Override
@@ -257,13 +257,17 @@ public class MainActivity extends AppCompatActivity {
 
             //upload file to Firebase storage
             photoRef.putFile(selectedImageUri).addOnSuccessListener(this, new OnSuccessListener<UploadTask.TaskSnapshot>() {
+
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                  progressBar.setVisibility(View.INVISIBLE);
                     //When the image has successfully uploaded, get its download URL
                     photoRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+
                         @Override
                         public void onSuccess(Uri uri) {
                             Uri dlUri = uri;
+                            Log.v("potato", "adding photo: " + photoRef.getName() );
                             RowData rowData= new RowData(photoRef.getName() +".jpg", mUsername, dlUri.toString(), false);
                             databaseReference.push().setValue(rowData);
 
@@ -274,8 +278,11 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
                     double progress = (100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
+                    System.out.println("upload is "+progress+"% done");
                     int currentProgress=(int)progress;
+                    progressBar.setVisibility(View.VISIBLE);
                     progressBar.setProgress(currentProgress);
+
                 }
             });
 
@@ -291,7 +298,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void onSignedInInitialize(String displayName) {
-        customAdapter.clear();
+
 
         mUsername=displayName;
 attachDatabaseReadListener();
@@ -302,9 +309,12 @@ attachDatabaseReadListener();
                 @Override
                 public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                     RowData row = dataSnapshot.getValue(RowData.class);
-                    row.setFileID(dataSnapshot.getKey());
-                    customAdapter.addItem(row);
 
+
+                    row.setFileID(dataSnapshot.getKey());
+                    if(customAdapter.hasItemWithFileId(row.getFileID())) {
+                        customAdapter.addItem(row);
+                    }
                 }
 
                 @Override
@@ -367,6 +377,9 @@ attachDatabaseReadListener();
 
 
     }
+
+
+
 }
 
 
