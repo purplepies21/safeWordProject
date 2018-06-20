@@ -16,6 +16,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
@@ -28,6 +29,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
@@ -60,6 +62,8 @@ public class MainActivity extends AppCompatActivity {
     private StorageReference imageRef;
     private StorageReference textRef;
     private Handler handler;
+    ProgressBar progressBar;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
 
         ///////////////////////////
 
-
+        progressBar=findViewById(R.id.seekBar);
 
         firebaseStorage = FirebaseStorage.getInstance();
 
@@ -174,11 +178,11 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public static void updateName(String id, String name, String photoURL, boolean locked){
+    public static void updateItem(String id, String name, String photoURL, boolean locked){
         DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReference().child("/users").child(firebaseAuth.getUid()).child("files").child(id);
         RowData row =new RowData(name, mUsername, photoURL, locked);
         databaseReference.setValue(row);
-        Toast.makeText(customAdapter.getContext(), "Name updated successfully!",Toast.LENGTH_LONG).show();
+        Toast.makeText(customAdapter.getContext(), " updated successfully!",Toast.LENGTH_LONG).show();
 
     }
     @Override
@@ -262,8 +266,16 @@ public class MainActivity extends AppCompatActivity {
                             Uri dlUri = uri;
                             RowData rowData= new RowData(photoRef.getName() +".jpg", mUsername, dlUri.toString(), false);
                             databaseReference.push().setValue(rowData);
+
                         }
                     });
+                }
+            }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                    double progress = (100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
+                    int currentProgress=(int)progress;
+                    progressBar.setProgress(currentProgress);
                 }
             });
 

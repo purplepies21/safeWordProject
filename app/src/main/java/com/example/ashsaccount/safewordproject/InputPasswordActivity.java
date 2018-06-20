@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.hardware.fingerprint.FingerprintManager;
-import android.media.Image;
 import android.os.Build;
 import android.os.Bundle;
 import android.security.keystore.KeyGenParameterSpec;
@@ -17,7 +16,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.andrognito.patternlockview.PatternLockView;
@@ -237,7 +235,7 @@ public class InputPasswordActivity extends AppCompatActivity {
        row.setLock(false);
 
        MainActivity.customAdapter.setSingleItem(row, position);
-       MainActivity.updateName(row.getFileID(), row.getText(), row.getPhotoUrl(), row.getLock());
+       MainActivity.updateItem(row.getFileID(), row.getText(), row.getPhotoUrl(), row.getLock());
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
         intent.putExtra("position", position);
         InputPasswordActivity.this.startActivity(intent);

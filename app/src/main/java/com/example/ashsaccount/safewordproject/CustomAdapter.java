@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.inputmethodservice.Keyboard;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -19,8 +18,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 
@@ -102,7 +99,7 @@ public class CustomAdapter extends ArrayAdapter<RowData> {
 
                 }else {
                     singleItem.setLock(true);
-                    MainActivity.updateName(singleItem.getFileID(),singleItem.getText(),singleItem.getPhotoUrl(),singleItem.getLock());
+                    MainActivity.updateItem(getSingleItem(position).getFileID(),getSingleItem(position).getText(),getSingleItem(position).getPhotoUrl(),getSingleItem(position).getLock());
                     lockButton.setImageResource(R.drawable.locked);
                     Toast.makeText(context, "File is now locked.",Toast.LENGTH_LONG).show();
 
@@ -153,9 +150,9 @@ public class CustomAdapter extends ArrayAdapter<RowData> {
             public void onClick(View v) {
             if(!editTextTitle.getText().toString().isEmpty()){
                 if(singleItem.getPhotoUrl()!=null) {
-                    MainActivity.updateName(fileId, editTextTitle.getText().toString().trim(), singleItem.getPhotoUrl(), singleItem.getLock());
+                    MainActivity.updateItem(fileId, editTextTitle.getText().toString().trim(), singleItem.getPhotoUrl(), singleItem.getLock());
                 }else{
-                    MainActivity.updateName(fileId,editTextTitle.getText().toString().trim(), null, singleItem.getLock());
+                    MainActivity.updateItem(fileId,editTextTitle.getText().toString().trim(), null, singleItem.getLock());
 
                 }
                 alertDialog.dismiss();
