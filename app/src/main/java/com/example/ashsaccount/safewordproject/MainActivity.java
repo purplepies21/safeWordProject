@@ -506,7 +506,6 @@ attachDatabaseReadListener();
         }
     }    private void detachDatabaseReadListener() {
         if(childEventListener!=null) {
-databaseReference.removeEventListener(childEventListener);
             childEventListener=null;
 
         }
