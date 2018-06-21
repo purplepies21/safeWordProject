@@ -319,13 +319,6 @@ attachDatabaseReadListener();
             firebaseAuth.removeAuthStateListener(authStateListener);
         }
         detachDatabaseReadListener();
-        messageListView.setAdapter(null);
-//        if(VIEW_MODE_LISTVIEW==currentViewMode) {
-//
-//            customAdapter.clear();
-//        }else {
-//            gridViewAdapter.clear();
-//        }
 
     }
 

@@ -163,32 +163,33 @@ public static boolean adapterType;
 
 
     public boolean initCipher() {
-        try {
-            cipher = Cipher.getInstance(
-                    KeyProperties.KEY_ALGORITHM_AES + "/"
-                            + KeyProperties.BLOCK_MODE_CBC + "/"
-                            + KeyProperties.ENCRYPTION_PADDING_PKCS7);
-        } catch (NoSuchAlgorithmException |
-                NoSuchPaddingException e) {
-            throw new RuntimeException("Failed to get Cipher", e);
-        }
+        if (fingerprintManager.hasEnrolledFingerprints()) {
+            try {
+                cipher = Cipher.getInstance(
+                        KeyProperties.KEY_ALGORITHM_AES + "/" + KeyProperties.BLOCK_MODE_CBC + "/" + KeyProperties.ENCRYPTION_PADDING_PKCS7);
+            } catch (NoSuchAlgorithmException |
+                    NoSuchPaddingException e) {
+                throw new RuntimeException("Failed to get Cipher", e);
+            }
 
-        try {
-            keyStore.load(null);
-            SecretKey key = (SecretKey) keyStore.getKey(KEY_NAME,
-                    null);
-            cipher.init(Cipher.ENCRYPT_MODE, key);
-            //Return true if the cipher has been initialized successfully//
-            return true;
-        } catch (KeyPermanentlyInvalidatedException e) {
+            try {
+                keyStore.load(null);
+                SecretKey key = (SecretKey) keyStore.getKey(KEY_NAME,
+                        null);
+                cipher.init(Cipher.ENCRYPT_MODE, key);
+                //Return true if the cipher has been initialized successfully//
+                return true;
+            } catch (KeyPermanentlyInvalidatedException e) {
 
-            //Return false if cipher initialization failed//
-            return false;
-        } catch (KeyStoreException | CertificateException
-                | UnrecoverableKeyException | IOException
-                | NoSuchAlgorithmException | InvalidKeyException e) {
-            throw new RuntimeException("Failed to init Cipher", e);
+                //Return false if cipher initialization failed//
+                return false;
+            } catch (KeyStoreException | CertificateException
+                    | UnrecoverableKeyException | IOException
+                    | NoSuchAlgorithmException | InvalidKeyException e) {
+                throw new RuntimeException("Failed to init Cipher", e);
+            }
         }
+        return false;
     }
 
     private class FingerprintException extends Exception {
