@@ -96,11 +96,7 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences= getSharedPreferences("ViewMode", MODE_PRIVATE);
         currentViewMode=sharedPreferences.getInt("currentViewMode", VIEW_MODE_LISTVIEW);
 
-
-
         firebaseStorage = FirebaseStorage.getInstance();
-
-
 
         firebaseAuth = FirebaseAuth.getInstance();
         setContentView(R.layout.activity_main);
@@ -119,18 +115,13 @@ public class MainActivity extends AppCompatActivity {
         messageListView = (ListView) findViewById(R.id.mylistview);
         gridView=(GridView)findViewById(R.id.mygridview);
 
-
-
         imageButton = (FloatingActionButton) findViewById(R.id.fab);
         try {
             databaseReference = firebaseDatabase.getReference().child("/users").child(firebaseAuth.getUid()).child("files");
             textRef = firebaseStorage.getReference().child("user").child(firebaseAuth.getUid()).child("textFiles");
 
             imageRef = firebaseStorage.getReference().child("user").child(firebaseAuth.getUid()).child("images");
-
-
-        }catch(NullPointerException e)
-        {
+        } catch (NullPointerException e) {
 //            databaseReference = firebaseDatabase.getReference().child("/users").child("Unauthorized").child("files");
 //            textRef = firebaseStorage.getReference().child("user").child("Unauthorized").child("textFiles");
 //
@@ -139,27 +130,17 @@ public class MainActivity extends AppCompatActivity {
 
         }        ///
 
-        if(VIEW_MODE_LISTVIEW==currentViewMode) {
-            customAdapter = new CustomAdapter(this);
-          if(gridViewAdapter!=null) {
-              gridViewAdapter.clear();
+        customAdapter = new CustomAdapter(this);
+        gridViewAdapter = new GridAdapter(this);
 
-          }
-          }else{
-           if(customAdapter!=null) {
-               customAdapter.clear();
-           }
-            gridViewAdapter = new GridAdapter(this);
-
+        if(gridViewAdapter!=null) {
+            gridViewAdapter.clear();
+        }
+        if(customAdapter!=null) {
+            customAdapter.clear();
         }
         switchView();
-
-
-
-
-
-
-
+        setAdapters();
 
         authStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -272,11 +253,8 @@ public class MainActivity extends AppCompatActivity {
             case R.id.swapView:
                 if(VIEW_MODE_LISTVIEW==currentViewMode){
                     currentViewMode=VIEW_MODE_GRIDVEIW;
-
-
                 }else{
                     currentViewMode=VIEW_MODE_LISTVIEW;
-
                 }
 
                 SharedPreferences sharedPreferences = getSharedPreferences("ViewMode", MODE_PRIVATE);
@@ -284,6 +262,7 @@ public class MainActivity extends AppCompatActivity {
                 editor.putInt("currentViewMode",currentViewMode);
                 editor.commit();
                 switchView();
+                setAdapters();
                 break;
             case R.id.new_pin_menu:
                 Intent intent= new Intent(getApplicationContext(), CreatePasswordActivity.class);
@@ -303,36 +282,26 @@ public class MainActivity extends AppCompatActivity {
         if(VIEW_MODE_LISTVIEW==currentViewMode) {
             stubList.setVisibility(View.VISIBLE);
             stubGrid.setVisibility(View.GONE);
-        }else{
+        } else {
             stubList.setVisibility(View.GONE);
             stubGrid.setVisibility(View.VISIBLE);
-
-
         }
-        setAdapters();
-
-
-
     }
 
     private void setAdapters() {
-        if(VIEW_MODE_LISTVIEW==currentViewMode) {
-
-
-           customAdapter= new CustomAdapter(this);
-            messageListView.setAdapter(customAdapter);
-
-            customAdapter.notifyDataSetChanged();
-
-        }else{
-
-            gridViewAdapter= new GridAdapter(this);
-            gridView.setAdapter(gridViewAdapter);
-            gridViewAdapter.notifyDataSetChanged();
+        if (customAdapter == null) {
+            customAdapter = new CustomAdapter(this);
         }
-//        onSignedInInitialize(mUsername);
+        if (gridViewAdapter == null) {
+            gridViewAdapter= new GridAdapter(this);
+        }
+        messageListView.setAdapter(customAdapter);
+        gridView.setAdapter(gridViewAdapter);
 
+        customAdapter.notifyDataSetChanged();
+        gridViewAdapter.notifyDataSetChanged();
     }
+
 
     @Override
     protected void onResume() {
@@ -444,50 +413,26 @@ attachDatabaseReadListener();
 
 
                     row.setFileID(dataSnapshot.getKey());
-                    if(VIEW_MODE_LISTVIEW==currentViewMode) {
 
-                        if(customAdapter.hasItemWithFileId(row.getFileID())) {
-                            customAdapter.addItem(row);
+                    if(customAdapter.hasItemWithFileId(row.getFileID())) {
+                        customAdapter.addItem(row);
+                        gridViewAdapter.addItem(row);
                         customAdapter.notifyDataSetChanged();
-                        }
-                    }else{
-                        if(gridViewAdapter.hasItemWithFileId(row.getFileID())) {
-                            gridViewAdapter.addItem(row);
                         gridViewAdapter.notifyDataSetChanged();
                     }
-                }
-
                 }
 
                 @Override
                 public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                    customAdapter.notifyDataSetChanged();
+                    gridViewAdapter.notifyDataSetChanged();
 
-
-
-
-
-                    if(VIEW_MODE_LISTVIEW==currentViewMode) {
-
-                        customAdapter.notifyDataSetChanged();
-                    }else {
-                        gridViewAdapter.notifyDataSetChanged();
-
-                    }
                 }
 
                 @Override
                 public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-
-
-                    if(VIEW_MODE_LISTVIEW==currentViewMode) {
-
-                        customAdapter.notifyDataSetChanged();
-                    }else {
-                        gridViewAdapter.notifyDataSetChanged();
-
-                    }
-
-
+                    customAdapter.notifyDataSetChanged();
+                    gridViewAdapter.notifyDataSetChanged();
                 }
 
                 @Override
@@ -526,16 +471,16 @@ attachDatabaseReadListener();
        if(photoURL!=null){
         StorageReference photoRef = firebaseStorage.getReferenceFromUrl(photoURL);
 
-        photoRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+               customAdapter.remove(customAdapter.getSingleItem(position));
+               customAdapter.notifyDataSetChanged();
+
+               gridViewAdapter.remove(gridViewAdapter.getSingleItem(position));
+               gridViewAdapter.notifyDataSetChanged();
+
+               photoRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
-                if(VIEW_MODE_LISTVIEW==currentViewMode) {
-
-                    Toast.makeText(customAdapter.getContext(), "File deleted successfully from storage", Toast.LENGTH_SHORT).show();
-                }else{
-                    Toast.makeText(gridViewAdapter.getContext(), "File deleted successfully from storage", Toast.LENGTH_SHORT).show();
-
-                }
+                Toast.makeText(customAdapter.getContext(), "File deleted successfully from storage", Toast.LENGTH_SHORT).show();
             }
         });}
         drFile.removeValue();
@@ -547,6 +492,7 @@ attachDatabaseReadListener();
 
 
 }
+
 
 
 
